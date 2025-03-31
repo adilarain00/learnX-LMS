@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(
   Cors({
     origin: [
-      "https://learnx-skpq.onrender.com",
+      "https://learn-x-jet.vercel.app/",
     ],
     credentials: true,
   })

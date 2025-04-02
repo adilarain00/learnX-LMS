@@ -14,57 +14,68 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import cors from "cors";
 import path from "path";
+
 export const app = express();
 
-// Middleware
-app.use(express.json({ limit: "50mb" }));
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+// ✅ Apply CORS Globally
 app.use(
   cors({
-    origin: [
-      "https://learn-x-jet.vercel.app/",
-    ],
-    credentials: true,
+    origin: "https://learn-x-jet.vercel.app", // ✅ Remove trailing slash
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // ✅ Allow all HTTP methods
+    credentials: true, // ✅ Allow cookies/authentication headers
+    allowedHeaders: "Content-Type, Authorization",
   })
 );
 
-// ✅ API rate limiting (before routes)
+// ✅ Handle Preflight Requests
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "https://learn-x-jet.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.sendStatus(204); // No Content
+});
+
+// ✅ Middleware
+app.use(express.json({ limit: "50mb" }));
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ API Rate Limiting
 const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // ⏳ 5 minutes instead of 15
-  max: 500, // 🚀 Increase the request limit to 500
-  message: "Too many requests, please try again later.", // Keep the message
+  windowMs: 5 * 60 * 1000, // ⏳ 5 minutes
+  max: 500, // 🚀 Increase request limit
+  message: "Too many requests, please try again later.",
   standardHeaders: "draft-7",
   legacyHeaders: false,
 });
-
 app.use(limiter);
 
-// ✅ Serve static files from the build folder in production
+// ✅ Serve Static Files (Production)
 const buildPath = path.join(__dirname, "../client/next");
 app.use(express.static(buildPath));
 
-// ✅ API Routes
+// ✅ API Routes with Correct Prefixes
 app.use("/api/v1/auth", userRouter);
-app.use("/api/v1/auth", courseRouter);
-app.use("/api/v1/auth", orderRouter);
-app.use("/api/v1/auth", notificationRouter);
-app.use("/api/v1/auth", analyticsRouter);
-app.use("/api/v1/auth", layoutRouter);
+app.use("/api/v1/courses", courseRouter);
+app.use("/api/v1/orders", orderRouter);
+app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/analytics", analyticsRouter);
+app.use("/api/v1/layouts", layoutRouter);
 
 // ✅ Test Route
 app.get("/test", (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: "CORS is working",
+    message: "CORS is working!",
   });
 });
 
+// ✅ Root Route
 app.get("/", (req, res) => {
   res.json({ success: true, message: "Backend is working!" });
 });
 
-// ✅ Handle undefined routes
+// ✅ Handle Undefined Routes
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const err = new Error(`Route ${req.originalUrl} not found`) as any;
   err.statusCode = 404;

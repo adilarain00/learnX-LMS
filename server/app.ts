@@ -59,6 +59,10 @@ app.get("/test", (req: Request, res: Response) => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "Backend is working!" });
+});
+
 // ✅ Handle undefined routes
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const err = new Error(`Route ${req.originalUrl} not found`) as any;

@@ -12,15 +12,16 @@ import userRouter from "./routes/user.route";
 
 import cookieParser from "cookie-parser";
 import express from "express";
-import Cors from "cors";
+import cors from "cors";
 import path from "path";
 export const app = express();
 
 // Middleware
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 app.use(
-  Cors({
+  cors({
     origin: [
       "https://learn-x-jet.vercel.app/",
     ],
@@ -44,18 +45,18 @@ const buildPath = path.join(__dirname, "../client/next");
 app.use(express.static(buildPath));
 
 // ✅ API Routes
-app.use("/api/v1", userRouter);
-app.use("/api/v1", courseRouter);
-app.use("/api/v1", orderRouter);
-app.use("/api/v1", notificationRouter);
-app.use("/api/v1", analyticsRouter);
-app.use("/api/v1", layoutRouter);
+app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/auth", courseRouter);
+app.use("/api/v1/auth", orderRouter);
+app.use("/api/v1/auth", notificationRouter);
+app.use("/api/v1/auth", analyticsRouter);
+app.use("/api/v1/auth", layoutRouter);
 
 // ✅ Test Route
 app.get("/test", (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: "API is working",
+    message: "CORS is working",
   });
 });
 

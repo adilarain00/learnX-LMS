@@ -21,19 +21,9 @@ export const app = express();
 app.use(
   cors({
     origin: "https://learn-x-jet.vercel.app",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
-    allowedHeaders: "Content-Type, Authorization",
   })
 );
-
-// ✅ Handle Preflight Requests
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "https://learn-x-jet.vercel.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.sendStatus(204); // No Content
-});
 
 // ✅ Middleware
 app.use(express.json({ limit: "50mb" }));

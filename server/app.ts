@@ -20,9 +20,9 @@ export const app = express();
 // ✅ Apply CORS Globally
 app.use(
   cors({
-    origin: "https://learn-x-jet.vercel.app", // ✅ Remove trailing slash
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // ✅ Allow all HTTP methods
-    credentials: true, // ✅ Allow cookies/authentication headers
+    origin: ["https://learn-x-jet.vercel.app", "http://localhost:3000", "http://localhost:8000"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    credentials: true,
     allowedHeaders: "Content-Type, Authorization",
   })
 );

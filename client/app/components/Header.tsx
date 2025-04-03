@@ -13,7 +13,7 @@ import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
 import Image from "next/image";
-import avatar from "../../public/assests/avatardefault.jpeg";
+import avatar from "../../public/assests/Profile.png";
 
 import {
   useLogOutQuery,
@@ -30,7 +30,6 @@ interface HeaderProps {
   route: string;
   setRoute: (route: string) => void;
 }
-
 const Header: FC<HeaderProps> = ({
   activeItem,
   setOpen,
@@ -41,7 +40,7 @@ const Header: FC<HeaderProps> = ({
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  const { data } = useSession();
+  const { data: sessionData, status, data } = useSession();
   const {
     data: userData,
     isLoading,
@@ -51,6 +50,12 @@ const Header: FC<HeaderProps> = ({
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
   const [logout, setLogOut] = useState(false);
   const {} = useLogOutQuery(undefined, { skip: !logout ? true : false });
+
+  useEffect(() => {
+    if (status === "authenticated" && sessionData) {
+      // Do something after successful login, like refetching data if necessary
+    }
+  }, [status, sessionData]);
 
   useEffect(() => {
     if (data && !userData) {
@@ -76,12 +81,6 @@ const Header: FC<HeaderProps> = ({
     }
   }, [data, userData, socialAuth, refetch]);
 
-  useEffect(() => {
-    if (data && userData) {
-      refetch(); // Ensure user data is up-to-date
-    }
-  }, [data, userData, refetch]);
-
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
       if (window.scrollY > 85) {
@@ -94,10 +93,11 @@ const Header: FC<HeaderProps> = ({
 
   const handleClose = (e: any) => {
     if (e.target.id === "screen") {
-      setOpenSidebar(false);
+      {
+        setOpenSidebar(false);
+      }
     }
   };
-
   return (
     <>
       {isLoading ? (
@@ -136,22 +136,14 @@ const Header: FC<HeaderProps> = ({
                       onClick={() => setOpenSidebar(true)}
                     />
                   </div>
-                  {userData?.user ? (
-                    <Link href={"/profile"}>
+                  {sessionData ? (
+                    <Link href="/profile">
                       <Image
-                        src={
-                          userData?.user.avatar
-                            ? userData.user.avatar.url
-                            : avatar
-                        }
-                        alt="Profile Image"
+                        src={sessionData?.user?.image || avatar} // Use session image
+                        alt="Profile"
                         width={30}
                         height={30}
                         className="w-[30px] h-[30px] rounded-full cursor-pointer"
-                        style={{
-                          border:
-                            activeItem === 5 ? "2px solid #37a39a" : "none",
-                        }}
                       />
                     </Link>
                   ) : (
@@ -174,22 +166,14 @@ const Header: FC<HeaderProps> = ({
               >
                 <div className="w-[70%] fixed  z-[999999999]  h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
                   <NavItems activeItem={activeItem} isMobile={true} />
-                  {userData?.user ? (
-                    <Link href={"/profile"} className="flex justify-center">
+                  {sessionData?.user ? (
+                    <Link href="/profile" className="flex justify-center">
                       <Image
-                        src={
-                          userData?.user.avatar
-                            ? userData.user.avatar.url
-                            : avatar
-                        }
-                        alt="Profile Image"
+                        src={sessionData.user.image || avatar} // Use session image
+                        alt="Profile"
                         width={30}
                         height={30}
                         className="w-[30px] h-[30px] rounded-full cursor-pointer"
-                        style={{
-                          border:
-                            activeItem === 5 ? "2px solid #37a39a" : "none",
-                        }}
                       />
                     </Link>
                   ) : (
@@ -209,34 +193,46 @@ const Header: FC<HeaderProps> = ({
             )}
           </div>
           {route === "Login" && (
-            <CustomModal
-              open={open}
-              setOpen={setOpen}
-              setRoute={setRoute}
-              activeItem={activeItem}
-              component={Login}
-              refetch={refetch}
-            />
+            <>
+              {open && (
+                <CustomModal
+                  open={open}
+                  setOpen={setOpen}
+                  setRoute={setRoute}
+                  activeItem={activeItem}
+                  component={Login}
+                  refetch={refetch}
+                />
+              )}
+            </>
           )}
 
           {route === "Sign-Up" && (
-            <CustomModal
-              open={open}
-              setOpen={setOpen}
-              setRoute={setRoute}
-              activeItem={activeItem}
-              component={SignUp}
-            />
+            <>
+              {open && (
+                <CustomModal
+                  open={open}
+                  setOpen={setOpen}
+                  setRoute={setRoute}
+                  activeItem={activeItem}
+                  component={SignUp}
+                />
+              )}
+            </>
           )}
 
           {route === "Verification" && (
-            <CustomModal
-              open={open}
-              setOpen={setOpen}
-              setRoute={setRoute}
-              activeItem={activeItem}
-              component={Verification}
-            />
+            <>
+              {open && (
+                <CustomModal
+                  open={open}
+                  setOpen={setOpen}
+                  setRoute={setRoute}
+                  activeItem={activeItem}
+                  component={Verification}
+                />
+              )}
+            </>
           )}
         </div>
       )}

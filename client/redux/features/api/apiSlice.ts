@@ -5,14 +5,6 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_SERVER_URI,
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${localStorage.getItem("token")}`);
-      }
-      return headers;
-    },
-    credentials: "include", // Ensure cookies are included
   }),
   endpoints: (builder) => ({
     refershToken: builder.query({

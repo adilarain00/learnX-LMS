@@ -12,9 +12,14 @@ import { type FC, useEffect } from "react"
 
 import Loader from "./components/Loader/Loader"
 import socketIO from "socket.io-client"
+import { useDispatch } from "react-redux";
+import { userLoggedIn } from "@/redux/features/auth/authSlice";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || ""
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] })
+
+const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
+const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "{}") : "";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -30,6 +35,14 @@ const josefin = Josefin_Sans({
 
 const Custom: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useLoadUserQuery({})
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (token) {
+      dispatch(userLoggedIn({ accessToken: token, user }));
+    }
+  }, [dispatch, token, user]);
 
   useEffect(() => {
     const handleConnection = () => {

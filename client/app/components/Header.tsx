@@ -40,7 +40,7 @@ const Header: FC<HeaderProps> = ({
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  const { data } = useSession();
+  const { data: sessionData, status, data } = useSession();
   const {
     data: userData,
     isLoading,
@@ -50,6 +50,12 @@ const Header: FC<HeaderProps> = ({
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
   const [logout, setLogOut] = useState(false);
   const {} = useLogOutQuery(undefined, { skip: !logout ? true : false });
+
+  useEffect(() => {
+    if (status === "authenticated" && sessionData) {
+      // Do something after successful login, like refetching data if necessary
+    }
+  }, [status, sessionData]);
 
   useEffect(() => {
     if (data && !userData) {
@@ -130,22 +136,14 @@ const Header: FC<HeaderProps> = ({
                       onClick={() => setOpenSidebar(true)}
                     />
                   </div>
-                  {userData ? (
-                    <Link href={"/profile"}>
+                  {sessionData ? (
+                    <Link href="/profile">
                       <Image
-                        src={
-                          userData?.user.avatar
-                            ? userData.user.avatar.url
-                            : avatar
-                        }
-                        alt=""
+                        src={sessionData?.user?.image || avatar} // Use session image
+                        alt="Profile"
                         width={30}
                         height={30}
                         className="w-[30px] h-[30px] rounded-full cursor-pointer"
-                        style={{
-                          border:
-                            activeItem === 5 ? "2px solid #37a39a" : "none",
-                        }}
                       />
                     </Link>
                   ) : (
@@ -168,22 +166,14 @@ const Header: FC<HeaderProps> = ({
               >
                 <div className="w-[70%] fixed  z-[999999999]  h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
                   <NavItems activeItem={activeItem} isMobile={true} />
-                  {userData?.user ? (
-                    <Link href={"/profile"} className="flex justify-center">
+                  {sessionData?.user ? (
+                    <Link href="/profile" className="flex justify-center">
                       <Image
-                        src={
-                          userData?.user.avatar
-                            ? userData.user.avatar.url
-                            : avatar
-                        }
-                        alt=""
+                        src={sessionData.user.image || avatar} // Use session image
+                        alt="Profile"
                         width={30}
                         height={30}
                         className="w-[30px] h-[30px] rounded-full cursor-pointer"
-                        style={{
-                          border:
-                            activeItem === 5 ? "2px solid #37a39a" : "none",
-                        }}
                       />
                     </Link>
                   ) : (

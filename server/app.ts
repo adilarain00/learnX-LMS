@@ -20,7 +20,7 @@ export const app = express();
 // ✅ Apply CORS Globally
 app.use(
   cors({
-    origin: ["https://learn-x-jet.vercel.app", "http://localhost:3000", "https://learnx-lu5v.onrender.com/"],
+    origin: "https://learn-x-jet.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
     allowedHeaders: "Content-Type, Authorization",
@@ -30,7 +30,6 @@ app.use(
 // ✅ Handle Preflight Requests
 app.options("*", (req, res) => {
   res.header("Access-Control-Allow-Origin", "https://learn-x-jet.vercel.app");
-  res.header("Access-Control-Allow-Origin", "https://learnx-lu5v.onrender.com/");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.sendStatus(204); // No Content

@@ -55,12 +55,12 @@ const buildPath = path.join(__dirname, "../client/next");
 app.use(express.static(buildPath));
 
 // ✅ API Routes with Correct Prefixes
-app.use("/api/v1/auth", userRouter);
-app.use("/api/v1/courses", courseRouter);
-app.use("/api/v1/orders", orderRouter);
-app.use("/api/v1/notifications", notificationRouter);
-app.use("/api/v1/analytics", analyticsRouter);
-app.use("/api/v1/layouts", layoutRouter);
+app.use("/api/v1", userRouter);
+app.use("/api/v1", courseRouter);
+app.use("/api/v1", orderRouter);
+app.use("/api/v1", notificationRouter);
+app.use("/api/v1", analyticsRouter);
+app.use("/api/v1", layoutRouter);
 
 // ✅ Test Route
 app.get("/test", (req: Request, res: Response) => {

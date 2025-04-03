@@ -30,6 +30,7 @@ interface HeaderProps {
   route: string;
   setRoute: (route: string) => void;
 }
+
 const Header: FC<HeaderProps> = ({
   activeItem,
   setOpen,
@@ -40,7 +41,7 @@ const Header: FC<HeaderProps> = ({
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  const { data: sessionData, status, data } = useSession();
+  const { data } = useSession();
   const {
     data: userData,
     isLoading,
@@ -50,12 +51,6 @@ const Header: FC<HeaderProps> = ({
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
   const [logout, setLogOut] = useState(false);
   const {} = useLogOutQuery(undefined, { skip: !logout ? true : false });
-
-  useEffect(() => {
-    if (status === "authenticated" && sessionData) {
-      // Do something after successful login, like refetching data if necessary
-    }
-  }, [status, sessionData]);
 
   useEffect(() => {
     if (data && !userData) {
@@ -81,6 +76,12 @@ const Header: FC<HeaderProps> = ({
     }
   }, [data, userData, socialAuth, refetch]);
 
+  useEffect(() => {
+    if (data && userData) {
+      refetch(); // Ensure user data is up-to-date
+    }
+  }, [data, userData, refetch]);
+
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
       if (window.scrollY > 85) {
@@ -93,11 +94,10 @@ const Header: FC<HeaderProps> = ({
 
   const handleClose = (e: any) => {
     if (e.target.id === "screen") {
-      {
-        setOpenSidebar(false);
-      }
+      setOpenSidebar(false);
     }
   };
+
   return (
     <>
       {isLoading ? (
@@ -136,14 +136,22 @@ const Header: FC<HeaderProps> = ({
                       onClick={() => setOpenSidebar(true)}
                     />
                   </div>
-                  {sessionData ? (
-                    <Link href="/profile">
+                  {userData?.user ? (
+                    <Link href={"/profile"}>
                       <Image
-                        src={sessionData?.user?.image || avatar} // Use session image
-                        alt="Profile"
+                        src={
+                          userData?.user.avatar
+                            ? userData.user.avatar.url
+                            : avatar
+                        }
+                        alt="Profile Image"
                         width={30}
                         height={30}
                         className="w-[30px] h-[30px] rounded-full cursor-pointer"
+                        style={{
+                          border:
+                            activeItem === 5 ? "2px solid #37a39a" : "none",
+                        }}
                       />
                     </Link>
                   ) : (
@@ -166,14 +174,22 @@ const Header: FC<HeaderProps> = ({
               >
                 <div className="w-[70%] fixed  z-[999999999]  h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
                   <NavItems activeItem={activeItem} isMobile={true} />
-                  {sessionData?.user ? (
-                    <Link href="/profile" className="flex justify-center">
+                  {userData?.user ? (
+                    <Link href={"/profile"} className="flex justify-center">
                       <Image
-                        src={sessionData.user.image || avatar} // Use session image
-                        alt="Profile"
+                        src={
+                          userData?.user.avatar
+                            ? userData.user.avatar.url
+                            : avatar
+                        }
+                        alt="Profile Image"
                         width={30}
                         height={30}
                         className="w-[30px] h-[30px] rounded-full cursor-pointer"
+                        style={{
+                          border:
+                            activeItem === 5 ? "2px solid #37a39a" : "none",
+                        }}
                       />
                     </Link>
                   ) : (
@@ -193,46 +209,34 @@ const Header: FC<HeaderProps> = ({
             )}
           </div>
           {route === "Login" && (
-            <>
-              {open && (
-                <CustomModal
-                  open={open}
-                  setOpen={setOpen}
-                  setRoute={setRoute}
-                  activeItem={activeItem}
-                  component={Login}
-                  refetch={refetch}
-                />
-              )}
-            </>
+            <CustomModal
+              open={open}
+              setOpen={setOpen}
+              setRoute={setRoute}
+              activeItem={activeItem}
+              component={Login}
+              refetch={refetch}
+            />
           )}
 
           {route === "Sign-Up" && (
-            <>
-              {open && (
-                <CustomModal
-                  open={open}
-                  setOpen={setOpen}
-                  setRoute={setRoute}
-                  activeItem={activeItem}
-                  component={SignUp}
-                />
-              )}
-            </>
+            <CustomModal
+              open={open}
+              setOpen={setOpen}
+              setRoute={setRoute}
+              activeItem={activeItem}
+              component={SignUp}
+            />
           )}
 
           {route === "Verification" && (
-            <>
-              {open && (
-                <CustomModal
-                  open={open}
-                  setOpen={setOpen}
-                  setRoute={setRoute}
-                  activeItem={activeItem}
-                  component={Verification}
-                />
-              )}
-            </>
+            <CustomModal
+              open={open}
+              setOpen={setOpen}
+              setRoute={setRoute}
+              activeItem={activeItem}
+              component={Verification}
+            />
           )}
         </div>
       )}
